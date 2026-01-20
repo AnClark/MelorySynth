@@ -1,0 +1,6 @@
+[submodule "deps/dpf"]
+	path = deps/dpf
+	url = https://github.com/DISTRHO/DPF.git
+[submodule "deps/fluidsynth"]
+	path = deps/fluidsynth
+	url = https://github.com/FluidSynth/fluidsynth/
