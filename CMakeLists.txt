@@ -20,6 +20,15 @@ if (NOT MSVC)
     add_compile_options (-fPIC)
 endif ()
 
+# HACK: Link against static dependency libraries on Win32 (e.g. Glib2, pcre, etc.)
+if (WIN32)
+    message (WARNING "HACK: You are building on Windows - prefer static dependencies linking")
+    # (1/2) Prefer static libraries
+    set (CMAKE_FIND_LIBRARY_SUFFIXES .a .lib ${CMAKE_FIND_LIBRARY_SUFFIXES})
+    # (2/2) Tell Glib2 (FluidSynth dependency) to prefer static libraries
+    add_compile_definitions (GLIB_STATIC_COMPILATION=1)
+endif ()
+
 #
 # Configure and build FluidSynth
 #
@@ -79,3 +88,10 @@ target_include_directories (${PROJECT_NAME} PUBLIC
 # Both DSP and UI need FluidSynth, since I implement soundfont parsing in UI
 # (because DSP does not support sending custom messages to UI yet)
 target_link_libraries (${PROJECT_NAME} PUBLIC libfluidsynth) 
+
+# HACK: Link libiconv statically on Windows (required by libintl, a dependency of Glib2)
+# NOTICE: This must be done after linking FluidSynth due to GNU linker behavior
+if (WIN32)
+    find_package (Iconv REQUIRED)    # Check if iconv is available
+    target_link_libraries (${PROJECT_NAME} PUBLIC iconv)
+endif ()
